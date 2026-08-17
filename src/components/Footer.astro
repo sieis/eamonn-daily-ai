@@ -7,10 +7,24 @@ const year = new Date().getFullYear();
 <footer class="site-footer" id="work-with-me">
   <div class="wrap">
     <section class="cta reveal">
-      <div class="cta-copy">
-        <span class="eyebrow"><span class="dot"></span> Work with me</span>
-        <h2>{cta.heading}</h2>
-        <p class="lede">{cta.body}</p>
+      <div class="cta-lead">
+        <img
+          class="cta-photo"
+          src={site.authorPhoto}
+          width="800"
+          height="800"
+          alt={site.author}
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="cta-copy">
+          <span class="eyebrow"><span class="dot"></span> Work with me</span>
+          <h2>{cta.heading}</h2>
+          <p class="lede">{cta.body}</p>
+          <p class="cta-byline">
+            <strong>{site.author}</strong> — {site.authorRole}
+          </p>
+        </div>
       </div>
       <a
         class="btn btn--primary cta-btn"
@@ -87,11 +101,42 @@ const year = new Date().getFullYear();
     pointer-events: none;
   }
 
-  .cta-copy {
+  .cta-lead {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* height:auto matters — without it the width/height attributes set the used
+     height and the circle stretches into an 800px column. */
+  .cta-photo {
+    width: 132px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+    object-fit: cover;
+    border-radius: 50%;
+    background: var(--bg-alt);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .cta-copy {
     max-width: 62ch;
     display: grid;
     gap: 12px;
+  }
+
+  .cta-byline {
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .cta-byline strong {
+    color: var(--ink);
+    font-weight: 620;
+    letter-spacing: -0.01em;
   }
 
   .cta-btn {
@@ -172,6 +217,16 @@ const year = new Date().getFullYear();
   @media (max-width: 640px) {
     .cta {
       padding: 28px 22px;
+    }
+
+    .cta-lead {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .cta-photo {
+      width: 96px;
     }
   }
 </style>

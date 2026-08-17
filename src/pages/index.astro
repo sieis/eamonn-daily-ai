@@ -11,45 +11,29 @@ const lastUpdated = articles[0]?.data.date;
 
 <BaseLayout>
   <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow rise"><span class="dot"></span> New stories every day</span>
-        <h1 class="rise headline">
-          AI and automation news that{' '}
-          <span class="gradient-text">affects how you work.</span>
-        </h1>
-        <p class="lede rise sub">{site.description}</p>
+    <div class="wrap">
+      <span class="eyebrow rise"><span class="dot"></span> New stories every day</span>
+      <h1 class="rise headline">
+        AI and automation news that{' '}
+        <span class="gradient-text">affects how you work.</span>
+      </h1>
+      <p class="lede rise sub">{site.description}</p>
 
-        <div class="byline rise">
-          <span class="byline-text">
-            <strong>{site.author}</strong>
-            <span class="byline-role">{site.authorRole}</span>
-          </span>
-        </div>
-
-        <div class="actions rise">
-          <a class="btn btn--primary" href={cta.buttonHref} target="_blank" rel="noopener noreferrer">
-            {cta.buttonLabel}
-            <span class="arrow" aria-hidden="true">→</span>
-          </a>
-          <a class="btn btn--ghost" href="#latest">Read today’s stories</a>
-        </div>
-
-        <div class="stats rise">
-          <span><strong>{articles.length}</strong> stories tracked</span>
-          {lastUpdated && <span>Last updated <strong>{formatDate(lastUpdated)}</strong></span>}
-        </div>
+      <div class="actions rise">
+        <a class="btn btn--primary" href={cta.buttonHref} target="_blank" rel="noopener noreferrer">
+          {cta.buttonLabel}
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="btn btn--ghost" href="#latest">Read today’s stories</a>
       </div>
 
-      <div class="hero-media rise">
-        <img
-          class="portrait"
-          src={site.authorPhoto}
-          width="800"
-          height="800"
-          alt={site.author}
-          decoding="async"
-        />
+      <p class="byline rise">
+        Written by <strong>{site.author}</strong>, {site.authorRole}
+      </p>
+
+      <div class="stats rise">
+        <span><strong>{articles.length}</strong> stories tracked</span>
+        {lastUpdated && <span>Last updated <strong>{formatDate(lastUpdated)}</strong></span>}
       </div>
     </div>
   </section>
@@ -131,19 +115,9 @@ const lastUpdated = articles[0]?.data.date;
     position: relative;
   }
 
-  /* Copy on the left, portrait on the right; stacks under 940px. */
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    align-items: center;
-    gap: clamp(32px, 5vw, 64px);
-  }
-
-  /* Slightly smaller than the global h1 — it shares the row with the video. */
   .headline {
     margin-top: 18px;
-    max-width: 16ch;
-    font-size: clamp(2.4rem, 4.4vw, 3.5rem);
+    max-width: 17ch;
   }
 
   .sub {
@@ -151,65 +125,43 @@ const lastUpdated = articles[0]?.data.date;
   }
 
   /* Stagger the hero elements so they cascade in. */
-  .hero-copy > .rise:nth-child(1) {
+  .hero .rise:nth-child(1) {
     animation-delay: 0.02s;
   }
-  .hero-copy > .rise:nth-child(2) {
+  .hero .rise:nth-child(2) {
     animation-delay: 0.08s;
   }
-  .hero-copy > .rise:nth-child(3) {
+  .hero .rise:nth-child(3) {
     animation-delay: 0.14s;
   }
-  .hero-copy > .rise:nth-child(4) {
+  .hero .rise:nth-child(4) {
     animation-delay: 0.2s;
   }
-  .hero-copy > .rise:nth-child(5) {
+  .hero .rise:nth-child(5) {
     animation-delay: 0.26s;
   }
-  .hero-copy > .rise:nth-child(6) {
+  .hero .rise:nth-child(6) {
     animation-delay: 0.32s;
-  }
-  .hero-media {
-    animation-delay: 0.2s;
-  }
-
-  .byline {
-    margin-top: 28px;
-  }
-
-  /* Portrait fills the right column, cropped square. height:auto is load-bearing:
-     without it the width/height attributes win and aspect-ratio is ignored. */
-  .portrait {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-    background: var(--bg-alt);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .byline-text {
-    display: grid;
-    font-size: 14.5px;
-    line-height: 1.35;
-  }
-
-  .byline-text strong {
-    font-weight: 620;
-    letter-spacing: -0.01em;
-  }
-
-  .byline-role {
-    color: var(--ink-3);
   }
 
   .actions {
-    margin-top: 28px;
+    margin-top: 32px;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  /* Byline + stats read as one small meta block under the buttons. */
+  .byline {
+    margin-top: 28px;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .byline strong {
+    color: var(--ink);
+    font-weight: 620;
+    letter-spacing: -0.01em;
   }
 
   /* Full-width intro video between the hero and the feed. */
@@ -245,7 +197,7 @@ const lastUpdated = articles[0]?.data.date;
   }
 
   .stats {
-    margin-top: 32px;
+    margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px 28px;
@@ -291,21 +243,6 @@ const lastUpdated = articles[0]?.data.date;
     background: var(--bg);
     border: 1px dashed var(--line-strong);
     border-radius: var(--radius-lg);
-  }
-
-  @media (max-width: 940px) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .headline {
-      max-width: 17ch;
-    }
-
-    /* A full-bleed square portrait would swallow the screen when stacked. */
-    .hero-media {
-      max-width: 380px;
-    }
   }
 
   @media (max-width: 560px) {
