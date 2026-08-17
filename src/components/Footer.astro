@@ -1,0 +1,172 @@
+---
+import { site, cta, socials } from '../site.config';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" id="work-with-me">
+  <div class="wrap">
+    <section class="cta reveal">
+      <div class="cta-copy">
+        <span class="eyebrow"><span class="dot"></span> Work with me</span>
+        <h2>{cta.heading}</h2>
+        <p class="lede">{cta.body}</p>
+      </div>
+      <a class="btn btn--primary cta-btn" href={cta.buttonHref}>
+        {cta.buttonLabel}
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </section>
+
+    <div class="meta">
+      <div class="brand-block">
+        <span class="mark" aria-hidden="true"></span>
+        <div>
+          <p class="brand-name">{site.title}</p>
+          <p class="brand-sub">{site.tagline}</p>
+        </div>
+      </div>
+
+      <nav class="links" aria-label="Elsewhere">
+        {
+          socials.map((s) => (
+            <a href={s.href} target="_blank" rel="noopener noreferrer">
+              {s.label}
+              <span class="arrow" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+
+    <p class="fine">© {year} {site.author}. Updated daily.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 96px;
+    padding-bottom: 40px;
+    border-top: 1px solid var(--line);
+    background: var(--bg-alt);
+  }
+
+  .cta {
+    margin-top: -48px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding: 40px;
+    border-radius: var(--radius-lg);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Soft gradient wash in the corner, purely decorative. */
+  .cta::before {
+    content: '';
+    position: absolute;
+    inset: auto -10% -60% auto;
+    width: 420px;
+    height: 420px;
+    background: var(--grad);
+    filter: blur(90px);
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
+  .cta-copy {
+    position: relative;
+    max-width: 62ch;
+    display: grid;
+    gap: 12px;
+  }
+
+  .cta-btn {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .meta {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .brand-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .mark {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    background: var(--grad);
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-weight: 640;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-sub {
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 22px;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14.5px;
+    font-weight: 550;
+    color: var(--ink-2);
+    transition: color 0.2s var(--ease);
+  }
+
+  .links a:hover {
+    color: var(--violet);
+  }
+
+  .links .arrow {
+    font-size: 12px;
+    transition: transform 0.2s var(--ease);
+  }
+
+  .links a:hover .arrow {
+    transform: translate(2px, -2px);
+  }
+
+  .fine {
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  @media (max-width: 640px) {
+    .cta {
+      padding: 28px 22px;
+    }
+  }
+</style>

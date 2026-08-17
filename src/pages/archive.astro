@@ -1,0 +1,264 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedArticles, formatShortDate } from '../lib/articles';
+
+const articles = await getPublishedArticles();
+
+// Group by year so the list stays scannable as it grows.
+const byYear = new Map<number, typeof articles>();
+for (const article of articles) {
+  const year = article.data.date.getUTCFullYear();
+  if (!byYear.has(year)) byYear.set(year, []);
+  byYear.get(year)!.push(article);
+}
+const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
+---
+
+<BaseLayout
+  title="Archive"
+  description="Every AI story tracked so far — searchable by title."
+>
+  <section class="head">
+    <div class="wrap">
+      <span class="eyebrow rise"><span class="dot"></span> Archive</span>
+      <h1 class="rise">Everything, all the way back.</h1>
+      <p class="lede rise">
+        {articles.length} stories and counting. Search by keyword to find one fast.
+      </p>
+
+      <div class="search rise">
+        <span class="icon" aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          id="archive-search"
+          placeholder="Search titles — try “agents”, “OpenAI”, “open source”…"
+          autocomplete="off"
+          aria-label="Search article titles"
+        />
+      </div>
+      <p class="count" id="search-count" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="list-wrap">
+    <div class="wrap">
+      {
+        years.map(([year, items]) => (
+          <div class="year-group" data-year={year}>
+            <h2 class="year">{year}</h2>
+            <ul class="list">
+              {items.map((article) => (
+                <li class="row" data-title={article.data.title.toLowerCase()}>
+                  <a href={`/articles/${article.id}/`}>
+                    <time datetime={article.data.date.toISOString()}>
+                      {formatShortDate(article.data.date)}
+                    </time>
+                    <span class="title">{article.data.title}</span>
+                    <span class="company">{article.data.company}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+
+      <p class="no-results" id="no-results" hidden>
+        No titles match that search. Try a shorter keyword.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const input = document.getElementById('archive-search') as HTMLInputElement | null;
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('.row'));
+  const groups = Array.from(document.querySelectorAll<HTMLElement>('.year-group'));
+  const countEl = document.getElementById('search-count');
+  const noResults = document.getElementById('no-results');
+
+  function filter() {
+    const query = (input?.value ?? '').trim().toLowerCase();
+    let visible = 0;
+
+    for (const row of rows) {
+      const match = query === '' || (row.dataset.title ?? '').includes(query);
+      row.hidden = !match;
+      if (match) visible++;
+    }
+
+    // Hide a year heading once every story under it is filtered out.
+    for (const group of groups) {
+      const anyVisible = Array.from(group.querySelectorAll<HTMLElement>('.row')).some(
+        (row) => !row.hidden,
+      );
+      group.hidden = !anyVisible;
+    }
+
+    if (noResults) noResults.hidden = visible !== 0;
+    if (countEl) {
+      countEl.textContent =
+        query === '' ? '' : `${visible} ${visible === 1 ? 'match' : 'matches'}`;
+    }
+  }
+
+  input?.addEventListener('input', filter);
+</script>
+
+<style>
+  .head {
+    padding: clamp(48px, 8vw, 88px) 0 32px;
+  }
+
+  .head h1 {
+    margin-top: 16px;
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+  }
+
+  .head .lede {
+    margin-top: 18px;
+  }
+
+  .head .rise:nth-child(1) {
+    animation-delay: 0.02s;
+  }
+  .head .rise:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .head .rise:nth-child(3) {
+    animation-delay: 0.18s;
+  }
+  .head .rise:nth-child(4) {
+    animation-delay: 0.26s;
+  }
+
+  .search {
+    margin-top: 30px;
+    max-width: 520px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+    transition:
+      box-shadow 0.24s var(--ease),
+      border-color 0.24s var(--ease);
+  }
+
+  .search:focus-within {
+    border-color: var(--violet);
+    box-shadow: 0 0 0 4px rgba(108, 76, 241, 0.12);
+  }
+
+  .search .icon {
+    font-size: 18px;
+    color: var(--ink-3);
+  }
+
+  .search input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 15px;
+  }
+
+  .search input::-webkit-search-cancel-button {
+    cursor: pointer;
+  }
+
+  .count {
+    margin-top: 10px;
+    min-height: 20px;
+    font-size: 13.5px;
+    color: var(--ink-3);
+  }
+
+  .year-group + .year-group {
+    margin-top: 40px;
+  }
+
+  .year {
+    font-size: 13px;
+    font-weight: 660;
+    letter-spacing: 0.08em;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+
+  .list {
+    list-style: none;
+    padding: 0;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+
+  .row + .row:not([hidden]) {
+    border-top: 1px solid var(--line);
+  }
+
+  .row a {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 15px 22px;
+    transition: background 0.18s var(--ease);
+  }
+
+  .row a:hover {
+    background: var(--bg-alt);
+  }
+
+  .row time {
+    flex-shrink: 0;
+    width: 58px;
+    font-size: 13px;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row .title {
+    flex: 1;
+    font-size: 15.5px;
+    font-weight: 550;
+    letter-spacing: -0.015em;
+    transition: color 0.18s var(--ease);
+  }
+
+  .row a:hover .title {
+    color: var(--violet);
+  }
+
+  .row .company {
+    flex-shrink: 0;
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+
+  .no-results {
+    padding: 44px;
+    text-align: center;
+    color: var(--ink-3);
+    background: var(--bg);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-lg);
+  }
+
+  @media (max-width: 620px) {
+    .row a {
+      flex-wrap: wrap;
+      gap: 4px 12px;
+    }
+
+    .row .title {
+      flex-basis: 100%;
+      order: 3;
+    }
+  }
+</style>
