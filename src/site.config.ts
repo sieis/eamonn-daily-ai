@@ -8,14 +8,24 @@ export const site = {
   description:
     'A daily rundown of the AI news that matters for normal people and modern businesses — what happened, why it matters, and what to do about it.',
   author: 'Eamonn Cottrell',
+  authorRole: 'AI + automation consultant',
+  // Drop the matching file in /public. If it is missing, the hero falls back to
+  // initials instead of showing a broken image.
+  authorPhoto: '/eamonn-cottrell.jpg',
+};
+
+/** Personal intro video in the hero. Swap the id for a new YouTube video. */
+export const intro = {
+  videoId: '-R83_uEQ4g0',
+  title: `${site.author} on what Daily AI is`,
+  caption: 'A quick intro: what this is, who it is for, and how I pick the stories.',
 };
 
 export const cta = {
   heading: 'Need help putting AI to work in your business?',
   body: 'I help businesses implement AI and automate the processes that eat their week — from a single stubborn workflow to a full AI strategy. If you have been reading about this stuff and wondering where to start, start here.',
-  buttonLabel: 'Work with me',
-  // Swap this for a Calendly / contact form / landing page whenever you have one.
-  buttonHref: 'mailto:eamonncottrell@gmail.com?subject=AI%20help%20for%20my%20business',
+  buttonLabel: 'Book a call',
+  buttonHref: 'https://www.gotsheet.xyz/products/consulting-call-with-eamonn',
 };
 
 export const socials = [

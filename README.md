@@ -51,11 +51,17 @@ src/
   styles/global.css     # design tokens + shared styles
   site.config.ts        # title, tagline, CTA text, social links
 public/favicon.svg
+public/eamonn-cottrell.jpg   # hero headshot (see below)
 ```
 
 ## Editing the site itself
 
 - **Title, tagline, CTA copy, social links** → `src/site.config.ts`
+- **Hero intro video** → `intro.videoId` in `src/site.config.ts` (just the YouTube id)
+- **Hero headshot** → drop the image at the path named by `site.authorPhoto`, i.e.
+  `public/eamonn-cottrell.jpg`. The hero checks for the file at build time and falls back
+  to initials in a gradient circle if it isn't there, so a missing photo never renders as a
+  broken image.
 - **Colors, fonts, spacing, radii** → the `:root` tokens at the top of `src/styles/global.css`
 - **Adding a frontmatter field** → `src/content.config.ts`, then render it in
   `src/pages/articles/[...slug].astro`
