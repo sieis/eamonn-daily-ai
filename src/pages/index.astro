@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import { getPublishedArticles, formatDate } from '../lib/articles';
-import { site } from '../site.config';
+import { getPublishedArticles, formatMonthDay } from '../lib/articles';
+import { site, intro, newsletter } from '../site.config';
 
 const articles = await getPublishedArticles();
 const latest = articles.slice(0, 12);
@@ -14,19 +14,58 @@ const lastUpdated = articles[0]?.data.date;
     <div class="wrap">
       <span class="eyebrow rise"><span class="dot"></span> New stories every day</span>
       <h1 class="rise headline">
-        The AI news that actually{' '}
-        <span class="gradient-text">changes how you work.</span>
+        The AI news{' '}
+        <span class="gradient-text">that matters to your work.</span>
       </h1>
       <p class="lede rise sub">{site.description}</p>
 
+      <div class="actions rise">
+        <a
+          class="btn btn--primary"
+          href={newsletter.buttonHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {newsletter.buttonLabel}
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="btn btn--ghost" href="#latest">Read today’s stories</a>
+      </div>
+
+      <p class="byline rise">
+        Written by <strong>{site.author}</strong>, {site.authorRole}
+      </p>
+
       <div class="stats rise">
-        <span><strong>{articles.length}</strong> stories tracked</span>
-        {lastUpdated && <span>Last updated <strong>{formatDate(lastUpdated)}</strong></span>}
+        <span>
+          <strong>{articles.length}</strong> stories today
+          {lastUpdated && (
+            <>
+              {' '}
+              · Updated <strong>{formatMonthDay(lastUpdated)}</strong>
+            </>
+          )}
+        </span>
       </div>
     </div>
   </section>
 
-  <section class="feed">
+  <section class="intro">
+    <div class="wrap">
+      <div class="video reveal">
+        <iframe
+          src={`https://www.youtube.com/embed/${intro.videoId}?rel=0`}
+          title={intro.title}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+      <p class="video-cap reveal">{intro.caption}</p>
+    </div>
+  </section>
+
+  <section class="feed" id="latest">
     <div class="wrap">
       <div class="feed-head">
         <h2>Latest</h2>
@@ -102,17 +141,75 @@ const lastUpdated = articles[0]?.data.date;
     animation-delay: 0.02s;
   }
   .hero .rise:nth-child(2) {
-    animation-delay: 0.1s;
+    animation-delay: 0.08s;
   }
   .hero .rise:nth-child(3) {
-    animation-delay: 0.18s;
+    animation-delay: 0.14s;
   }
   .hero .rise:nth-child(4) {
+    animation-delay: 0.2s;
+  }
+  .hero .rise:nth-child(5) {
     animation-delay: 0.26s;
+  }
+  .hero .rise:nth-child(6) {
+    animation-delay: 0.32s;
+  }
+
+  .actions {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  /* Byline + stats read as one small meta block under the buttons. */
+  .byline {
+    margin-top: 28px;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .byline strong {
+    color: var(--ink);
+    font-weight: 620;
+    letter-spacing: -0.01em;
+  }
+
+  /* Full-width intro video between the hero and the feed. */
+  .intro {
+    padding: clamp(8px, 2vw, 24px) 0 clamp(40px, 6vw, 72px);
+  }
+
+  /* 16:9 frame so the embed scales with the page on every screen. */
+  .video {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .video iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .video-cap {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--ink-3);
+    text-align: center;
+    text-wrap: balance;
   }
 
   .stats {
-    margin-top: 32px;
+    margin-top: 10px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px 28px;
@@ -164,6 +261,11 @@ const lastUpdated = articles[0]?.data.date;
     .feed-head {
       flex-direction: column;
       align-items: flex-start;
+    }
+
+    .actions .btn {
+      flex: 1 1 auto;
+      justify-content: center;
     }
   }
 </style>

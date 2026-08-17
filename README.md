@@ -51,11 +51,16 @@ src/
   styles/global.css     # design tokens + shared styles
   site.config.ts        # title, tagline, CTA text, social links
 public/favicon.svg
+public/eamonn-cottrell.jpg   # hero headshot (see below)
 ```
 
 ## Editing the site itself
 
 - **Title, tagline, CTA copy, social links** → `src/site.config.ts`
+- **Hero intro video** → `intro.videoId` in `src/site.config.ts` (just the YouTube id)
+- **Headshot** (in the "Work with me" CTA) → replace `public/eamonn-cottrell.jpg`, or point
+  `site.authorPhoto` at a different file in `public/`. It is cropped to a circle, so a
+  square source looks best.
 - **Colors, fonts, spacing, radii** → the `:root` tokens at the top of `src/styles/global.css`
 - **Adding a frontmatter field** → `src/content.config.ts`, then render it in
   `src/pages/articles/[...slug].astro`

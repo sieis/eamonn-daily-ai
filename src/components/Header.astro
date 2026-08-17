@@ -31,7 +31,12 @@ const links = [
       }
     </nav>
 
-    <a class="btn btn--primary header-cta" href={cta.buttonHref}>
+    <a
+      class="btn btn--primary header-cta"
+      href={cta.buttonHref}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       {cta.buttonLabel}
       <span class="arrow" aria-hidden="true">→</span>
     </a>
