@@ -9,8 +9,7 @@ export const site = {
     'A daily rundown of the AI news that matters for normal people and modern businesses — what happened, why it matters, and what to do about it.',
   author: 'Eamonn Cottrell',
   authorRole: 'AI + automation consultant',
-  // Drop the matching file in /public. If it is missing, the hero falls back to
-  // initials instead of showing a broken image.
+  // Lives in /public, so this is the path it is served from.
   authorPhoto: '/eamonn-cottrell.jpg',
 };
 
