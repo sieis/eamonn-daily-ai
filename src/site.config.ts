@@ -6,7 +6,7 @@ export const site = {
   title: 'Daily AI',
   tagline: 'AI news for people who actually run a business.',
   description:
-    'A daily rundown of the AI news that matters for normal people and modern businesses — what happened, why it matters, and what to do about it.',
+    'A daily rundown of the AI developments that matter to your work and business: what happened, why it matters, and what to do about it.',
   author: 'Eamonn Cottrell',
   authorRole: 'AI + automation consultant',
   // Lives in /public, so this is the path it is served from.
@@ -25,6 +25,12 @@ export const cta = {
   body: 'I help businesses implement AI and automate the processes that eat their week — from a single stubborn workflow to a full AI strategy. If you have been reading about this stuff and wondering where to start, start here.',
   buttonLabel: 'Book a call',
   buttonHref: 'https://www.gotsheet.xyz/products/consulting-call-with-eamonn',
+};
+
+/** The hero's primary button — a newsletter signup, not the "Book a call" CTA. */
+export const newsletter = {
+  buttonLabel: 'Get Daily AI by email',
+  buttonHref: 'https://www.gotsheet.xyz/subscribe',
 };
 
 export const socials = [

@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import { getPublishedArticles, formatDate } from '../lib/articles';
-import { site, intro, cta } from '../site.config';
+import { getPublishedArticles, formatMonthDay } from '../lib/articles';
+import { site, intro, newsletter } from '../site.config';
 
 const articles = await getPublishedArticles();
 const latest = articles.slice(0, 12);
@@ -14,14 +14,19 @@ const lastUpdated = articles[0]?.data.date;
     <div class="wrap">
       <span class="eyebrow rise"><span class="dot"></span> New stories every day</span>
       <h1 class="rise headline">
-        AI and automation news that{' '}
-        <span class="gradient-text">affects how you work.</span>
+        The AI news{' '}
+        <span class="gradient-text">that matters to your work.</span>
       </h1>
       <p class="lede rise sub">{site.description}</p>
 
       <div class="actions rise">
-        <a class="btn btn--primary" href={cta.buttonHref} target="_blank" rel="noopener noreferrer">
-          {cta.buttonLabel}
+        <a
+          class="btn btn--primary"
+          href={newsletter.buttonHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {newsletter.buttonLabel}
           <span class="arrow" aria-hidden="true">→</span>
         </a>
         <a class="btn btn--ghost" href="#latest">Read today’s stories</a>
@@ -32,8 +37,15 @@ const lastUpdated = articles[0]?.data.date;
       </p>
 
       <div class="stats rise">
-        <span><strong>{articles.length}</strong> stories tracked</span>
-        {lastUpdated && <span>Last updated <strong>{formatDate(lastUpdated)}</strong></span>}
+        <span>
+          <strong>{articles.length}</strong> stories today
+          {lastUpdated && (
+            <>
+              {' '}
+              · Updated <strong>{formatMonthDay(lastUpdated)}</strong>
+            </>
+          )}
+        </span>
       </div>
     </div>
   </section>

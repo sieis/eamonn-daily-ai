@@ -22,6 +22,15 @@ export function formatDate(date: Date) {
   }).format(date);
 }
 
+/** "August 17" — no year, used in the hero's compact stats line. */
+export function formatMonthDay(date: Date) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+}
+
 /** "Aug 17" — the compact form used in the archive list. */
 export function formatShortDate(date: Date) {
   return new Intl.DateTimeFormat('en-US', {
