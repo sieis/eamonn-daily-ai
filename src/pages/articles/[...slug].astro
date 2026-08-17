@@ -1,0 +1,258 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedArticles, formatDate, sourceHost } from '../../lib/articles';
+
+export async function getStaticPaths() {
+  const articles = await getPublishedArticles();
+  return articles.map((article: { id: string }) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const { data } = article;
+const { Content } = await render(article);
+
+// Markdown bodies are optional — most articles are frontmatter only.
+const hasBody = Boolean(article.body?.trim());
+---
+
+<BaseLayout title={data.title} description={data.summary}>
+  <article class="post">
+    <div class="wrap narrow">
+      <a class="back" href="/">
+        <span class="arrow" aria-hidden="true">←</span> All stories
+      </a>
+
+      <div class="tags">
+        <span class="chip chip--accent">{data.company}</span>
+        {data.priority === 'High' && <span class="chip chip--high">🔥 High priority</span>}
+        <span class="chip">{data.audience}</span>
+        {data.formatFit && <span class="chip">{data.formatFit}</span>}
+      </div>
+
+      <h1>{data.title}</h1>
+
+      <p class="byline">
+        <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+        <span class="sep" aria-hidden="true">·</span>
+        <a href={data.source} target="_blank" rel="noopener noreferrer">
+          {data.sourceName ?? sourceHost(data.source)}
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </p>
+
+      <p class="summary">{data.summary}</p>
+
+      {
+        data.keyDetails.length > 0 && (
+          <section class="block reveal">
+            <h2>Key details</h2>
+            <ul class="details">
+              {data.keyDetails.map((detail: string) => (
+                <li>{detail}</li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        data.whyItMatters && (
+          <section class="block callout reveal">
+            <h2>Why it matters</h2>
+            <p>{data.whyItMatters}</p>
+          </section>
+        )
+      }
+
+      {
+        data.consultingAngle && (
+          <section class="block callout callout--accent reveal">
+            <h2>The business angle</h2>
+            <p>{data.consultingAngle}</p>
+          </section>
+        )
+      }
+
+      {
+        hasBody && (
+          <section class="block prose reveal">
+            <Content />
+          </section>
+        )
+      }
+
+      <section class="block reveal">
+        <a class="btn btn--ghost" href={data.source} target="_blank" rel="noopener noreferrer">
+          Read the original at {data.sourceName ?? sourceHost(data.source)}
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post {
+    padding: clamp(36px, 6vw, 72px) 0 0;
+  }
+
+  .narrow {
+    max-width: 760px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    font-weight: 550;
+    color: var(--ink-3);
+    transition: color 0.2s var(--ease);
+  }
+
+  .back:hover {
+    color: var(--violet);
+  }
+
+  .back .arrow {
+    display: inline-block;
+    transition: transform 0.2s var(--ease);
+  }
+
+  .back:hover .arrow {
+    transform: translateX(-3px);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 18px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 4.6vw, 3.1rem);
+  }
+
+  .byline {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .byline a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 550;
+    color: var(--violet);
+  }
+
+  .byline a:hover {
+    text-decoration: underline;
+  }
+
+  .byline .sep {
+    opacity: 0.5;
+  }
+
+  .summary {
+    margin-top: 26px;
+    padding-left: 20px;
+    border-left: 3px solid transparent;
+    border-image: var(--grad) 1;
+    font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .block {
+    margin-top: 44px;
+  }
+
+  .block h2 {
+    font-size: 13px;
+    font-weight: 660;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+
+  .details {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .details li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--ink-2);
+  }
+
+  .details li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--grad);
+  }
+
+  .callout {
+    padding: 26px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .callout p {
+    color: var(--ink-2);
+  }
+
+  .callout--accent {
+    background: var(--grad-soft);
+    border-color: rgba(108, 76, 241, 0.2);
+  }
+
+  .prose :global(p) {
+    color: var(--ink-2);
+    margin-bottom: 16px;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3) {
+    margin: 28px 0 12px;
+    text-transform: none;
+    letter-spacing: -0.02em;
+    font-size: 1.3rem;
+    color: var(--ink);
+  }
+
+  .prose :global(a) {
+    color: var(--violet);
+    text-decoration: underline;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 20px;
+    color: var(--ink-2);
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+</style>
