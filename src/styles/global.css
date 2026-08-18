@@ -1,7 +1,10 @@
 /* ---------------------------------------------------------------
    Design tokens
-   Jitter-ish: near-black ink on a soft gray canvas, one violet→blue
+   Jitter-ish: near-black ink on a soft gray canvas, one deep-green
    gradient doing all the accent work, big tight headlines, round cards.
+
+   Every accent on the site derives from --accent / --accent-2, so
+   recoloring the whole thing means editing exactly those two lines.
    --------------------------------------------------------------- */
 :root {
   --ink: #0a0a14;
@@ -12,10 +15,19 @@
   --line: #e7e7f0;
   --line-strong: #d7d8e4;
 
-  --violet: #6c4cf1;
-  --blue: #2c6bf5;
-  --grad: linear-gradient(102deg, #6c4cf1 0%, #2c6bf5 100%);
-  --grad-soft: linear-gradient(102deg, rgba(108, 76, 241, 0.1), rgba(44, 107, 245, 0.1));
+  --accent: #0a6b4a;
+  --accent-2: #18a06b;
+  --grad: linear-gradient(102deg, var(--accent) 0%, var(--accent-2) 100%);
+  --grad-soft: linear-gradient(
+    102deg,
+    color-mix(in srgb, var(--accent) 10%, transparent),
+    color-mix(in srgb, var(--accent-2) 10%, transparent)
+  );
+
+  /* Tints of the accent: chip and callout borders, button glow, focus ring. */
+  --accent-line: color-mix(in srgb, var(--accent) 24%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 32%, transparent);
+  --accent-ring: color-mix(in srgb, var(--accent) 16%, transparent);
 
   --radius-sm: 10px;
   --radius: 16px;
@@ -78,7 +90,7 @@ input {
 }
 
 :focus-visible {
-  outline: 2px solid var(--violet);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -192,8 +204,8 @@ p {
 
 .chip--accent {
   background: var(--grad-soft);
-  border-color: rgba(108, 76, 241, 0.22);
-  color: var(--violet);
+  border-color: var(--accent-line);
+  color: var(--accent);
 }
 
 .chip--high {
@@ -225,12 +237,12 @@ p {
 .btn--primary {
   background: var(--grad);
   color: #fff;
-  box-shadow: 0 6px 18px rgba(88, 89, 243, 0.28);
+  box-shadow: 0 6px 18px var(--accent-glow);
 }
 
 .btn--primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(88, 89, 243, 0.36);
+  box-shadow: 0 12px 28px var(--accent-glow);
 }
 
 .btn--ghost {

@@ -68,12 +68,14 @@ public/eamonn-cottrell.jpg   # hero headshot (see below)
   `site.authorPhoto` at a different file in `public/`. It is cropped to a circle, so a
   square source looks best.
 - **Colors, fonts, spacing, radii** → the `:root` tokens at the top of `src/styles/global.css`
+- **The accent color** → `--accent` and `--accent-2` in those tokens, nothing else. Every
+  gradient, chip, link, button glow and focus ring is derived from those two hex values.
 - **Adding a frontmatter field** → `src/content.config.ts`, then render it in
   `src/components/ArticleBody.astro` (shared by the day page and the article page)
 
 ## Design
 
-Light canvas, near-black ink, one violet→blue gradient carrying every accent, Inter with
+Light canvas, near-black ink, one deep-green gradient carrying every accent, Inter with
 tight tracking on the headlines, and rounded cards that lift on hover. Content fades up as
 it scrolls into view, and the whole thing respects `prefers-reduced-motion`. Inspired by
 [jitter.video](https://jitter.video).

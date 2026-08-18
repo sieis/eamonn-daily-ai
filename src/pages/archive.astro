@@ -149,8 +149,8 @@ const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
   }
 
   .search:focus-within {
-    border-color: var(--violet);
-    box-shadow: 0 0 0 4px rgba(108, 76, 241, 0.12);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-ring);
   }
 
   .search .icon {
@@ -232,7 +232,7 @@ const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
   }
 
   .row a:hover .title {
-    color: var(--violet);
+    color: var(--accent);
   }
 
   .row .company {
