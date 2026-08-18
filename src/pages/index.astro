@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ArticleCard from '../components/ArticleCard.astro';
-import { getPublishedArticles, formatMonthDay } from '../lib/articles';
+import DayCard from '../components/DayCard.astro';
+import { getPublishedArticles, groupByDay, formatMonthDay } from '../lib/articles';
 import { site, intro, newsletter } from '../site.config';
 
 const articles = await getPublishedArticles();
-const latest = articles.slice(0, 12);
-const lastUpdated = articles[0]?.data.date;
+// One card per day, most recent first.
+const days = groupByDay(articles).slice(0, 12);
+const today = days[0];
+const lastUpdated = today?.date;
 ---
 
 <BaseLayout>
@@ -38,7 +40,7 @@ const lastUpdated = articles[0]?.data.date;
 
       <div class="stats rise">
         <span>
-          <strong>{articles.length}</strong> stories today
+          <strong>{today?.articles.length ?? 0}</strong> stories today
           {lastUpdated && (
             <>
               {' '}
@@ -76,22 +78,21 @@ const lastUpdated = articles[0]?.data.date;
       </div>
 
       {
-        latest.length === 0 ? (
+        days.length === 0 ? (
           <p class="empty">
             No stories yet — the first daily run will drop them right here.
           </p>
         ) : (
           <div class="grid">
-            {latest.map((article) => (
-              <ArticleCard
-                id={article.id}
-                title={article.data.title}
-                date={article.data.date}
-                summary={article.data.summary}
-                company={article.data.company}
-                priority={article.data.priority}
-                source={article.data.source}
-                sourceName={article.data.sourceName}
+            {days.map((day) => (
+              <DayCard
+                dayKey={day.key}
+                date={day.date}
+                stories={day.articles.map((article) => ({
+                  title: article.data.title,
+                  company: article.data.company,
+                  priority: article.data.priority,
+                }))}
               />
             ))}
           </div>

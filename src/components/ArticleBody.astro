@@ -1,0 +1,224 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { formatDate, sourceHost } from '../lib/articles';
+
+/**
+ * One rendered story — tags, headline, byline, summary and the callout blocks.
+ * Shared by the standalone article page and by each panel of a day page, so the
+ * two always look the same.
+ */
+interface Props {
+  article: CollectionEntry<'articles'>;
+  /** 1 on the standalone page; 2 on a day page, where the date owns the h1. */
+  headingLevel?: 1 | 2;
+}
+
+const { article, headingLevel = 1 } = Astro.props;
+const { data } = article;
+const { Content } = await render(article);
+const Title = `h${headingLevel}` as 'h1' | 'h2';
+
+// Markdown bodies are optional — most articles are frontmatter only.
+const hasBody = Boolean(article.body?.trim());
+---
+
+<div class="tags">
+  <span class="chip chip--accent">{data.company}</span>
+  {data.priority === 'High' && <span class="chip chip--high">🔥 High priority</span>}
+  <span class="chip">{data.audience}</span>
+  {data.formatFit && <span class="chip">{data.formatFit}</span>}
+</div>
+
+<Title class="title">{data.title}</Title>
+
+<p class="byline">
+  <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+  <span class="sep" aria-hidden="true">·</span>
+  <a href={data.source} target="_blank" rel="noopener noreferrer">
+    {data.sourceName ?? sourceHost(data.source)}
+    <span class="arrow" aria-hidden="true">↗</span>
+  </a>
+</p>
+
+<p class="summary">{data.summary}</p>
+
+{
+  data.keyDetails.length > 0 && (
+    <section class="block">
+      <h3>Key details</h3>
+      <ul class="details">
+        {data.keyDetails.map((detail: string) => (
+          <li>{detail}</li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+{
+  data.whyItMatters && (
+    <section class="block callout">
+      <h3>Why it matters</h3>
+      <p>{data.whyItMatters}</p>
+    </section>
+  )
+}
+
+{
+  data.consultingAngle && (
+    <section class="block callout callout--accent">
+      <h3>The business angle</h3>
+      <p>{data.consultingAngle}</p>
+    </section>
+  )
+}
+
+{
+  hasBody && (
+    <section class="block prose">
+      <Content />
+    </section>
+  )
+}
+
+<section class="block">
+  <a class="btn btn--ghost" href={data.source} target="_blank" rel="noopener noreferrer">
+    Read the original at {data.sourceName ?? sourceHost(data.source)}
+    <span class="arrow" aria-hidden="true">↗</span>
+  </a>
+</section>
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .title {
+    font-size: clamp(2rem, 4.6vw, 3.1rem);
+    font-weight: 620;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  .byline {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--ink-3);
+  }
+
+  .byline a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 550;
+    color: var(--violet);
+  }
+
+  .byline a:hover {
+    text-decoration: underline;
+  }
+
+  .byline .sep {
+    opacity: 0.5;
+  }
+
+  .summary {
+    margin-top: 26px;
+    padding-left: 20px;
+    border-left: 3px solid transparent;
+    border-image: var(--grad) 1;
+    font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .block {
+    margin-top: 44px;
+  }
+
+  .block h3 {
+    font-size: 13px;
+    font-weight: 660;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+
+  .details {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .details li {
+    position: relative;
+    padding-left: 22px;
+    color: var(--ink-2);
+  }
+
+  .details li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--grad);
+  }
+
+  .callout {
+    padding: 26px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .callout p {
+    color: var(--ink-2);
+  }
+
+  .callout--accent {
+    background: var(--grad-soft);
+    border-color: rgba(108, 76, 241, 0.2);
+  }
+
+  .prose :global(p) {
+    color: var(--ink-2);
+    margin-bottom: 16px;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3) {
+    margin: 28px 0 12px;
+    text-transform: none;
+    letter-spacing: -0.02em;
+    font-size: 1.3rem;
+    color: var(--ink);
+  }
+
+  .prose :global(a) {
+    color: var(--violet);
+    text-decoration: underline;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 20px;
+    color: var(--ink-2);
+    display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+</style>

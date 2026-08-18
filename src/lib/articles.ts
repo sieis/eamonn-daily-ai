@@ -12,6 +12,29 @@ export async function getPublishedArticles() {
   );
 }
 
+/** "2026-08-17" — the UTC day key used for grouping and for day-page URLs. */
+export function dayKey(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+/**
+ * Articles bucketed into one entry per day, newest day first. Each day keeps the
+ * order it came in with, which is already newest-first from getPublishedArticles.
+ */
+export function groupByDay<T extends { data: { date: Date } }>(articles: T[]) {
+  const byDay = new Map<string, T[]>();
+
+  for (const article of articles) {
+    const key = dayKey(article.data.date);
+    if (!byDay.has(key)) byDay.set(key, []);
+    byDay.get(key)!.push(article);
+  }
+
+  return [...byDay.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, items]) => ({ key, date: items[0].data.date, articles: items }));
+}
+
 /** "August 17, 2026" — formatted in UTC so the date never drifts a day. */
 export function formatDate(date: Date) {
   return new Intl.DateTimeFormat('en-US', {

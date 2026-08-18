@@ -1,0 +1,166 @@
+---
+import { formatDate } from '../lib/articles';
+
+/** One card per day on the homepage: the date, the headlines under it, one link. */
+interface Props {
+  dayKey: string;
+  date: Date;
+  stories: { title: string; company: string; priority: string }[];
+}
+
+const { dayKey, date, stories } = Astro.props;
+
+// Show the first handful of headlines; the rest are counted in the footer.
+const MAX_TITLES = 5;
+const shown = stories.slice(0, MAX_TITLES);
+const hidden = stories.length - shown.length;
+const hasHigh = stories.some((story) => story.priority === 'High');
+
+// Up to three companies, so the footer reads like a table of contents.
+const companies = [...new Set(stories.map((story) => story.company))];
+const companyLabel = [
+  ...companies.slice(0, 3),
+  ...(companies.length > 3 ? [`+${companies.length - 3}`] : []),
+].join(' · ');
+---
+
+<article class="card reveal">
+  <a class="card-link" href={`/days/${dayKey}/`}>
+    <header class="top">
+      <span class="chip chip--accent">
+        {`${stories.length} ${stories.length === 1 ? 'story' : 'stories'}`}
+      </span>
+      {hasHigh && <span class="chip chip--high">🔥 High</span>}
+    </header>
+
+    <h3>
+      <time datetime={date.toISOString()}>{formatDate(date)}</time>
+    </h3>
+
+    <ul class="titles">
+      {
+        shown.map((story) => (
+          <li>
+            <span class="bullet" aria-hidden="true" />
+            <span class="title-text">{story.title}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    {hidden > 0 && <p class="more">+{hidden} more</p>}
+
+    <footer class="bottom">
+      <span class="companies">{companyLabel}</span>
+      <span class="read">Read <span class="arrow" aria-hidden="true">→</span></span>
+    </footer>
+  </a>
+</article>
+
+<style>
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform 0.28s var(--ease),
+      box-shadow 0.28s var(--ease),
+      border-color 0.28s var(--ease);
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--line-strong);
+  }
+
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    padding: 26px;
+  }
+
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .titles {
+    list-style: none;
+    padding: 0;
+    margin: 2px 0 0;
+    display: grid;
+    gap: 9px;
+  }
+
+  .titles li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+    font-size: 14.5px;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  .bullet {
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--grad);
+    translate: 0 -2px;
+  }
+
+  /* Partial titles: one line each, so every card stays the same shape. */
+  .title-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .more {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .bottom {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .companies {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink-3);
+  }
+
+  .read {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: var(--violet);
+  }
+
+  .read .arrow {
+    display: inline-block;
+    transition: transform 0.22s var(--ease);
+  }
+
+  .card:hover .read .arrow {
+    transform: translateX(4px);
+  }
+</style>
