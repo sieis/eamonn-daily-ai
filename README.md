@@ -68,16 +68,19 @@ public/eamonn-cottrell.jpg   # hero headshot (see below)
   `site.authorPhoto` at a different file in `public/`. It is cropped to a circle, so a
   square source looks best.
 - **Colors, fonts, spacing, radii** → the `:root` tokens at the top of `src/styles/global.css`
-- **The accent color** → `--accent` and `--accent-2` in those tokens, nothing else. Every
-  gradient, chip, link, button glow and focus ring is derived from those two hex values.
+- **The brand palette** → the five hex values at the top of `src/styles/global.css`. Every
+  gradient, chip, link, border, button glow and focus ring is mixed off them, so the site
+  recolors from that one block. `public/favicon.svg` carries the same gradient by hand.
 - **Adding a frontmatter field** → `src/content.config.ts`, then render it in
   `src/components/ArticleBody.astro` (shared by the day page and the article page)
 
 ## Design
 
-Light canvas, near-black ink, one deep-green gradient carrying every accent, Inter with
-tight tracking on the headlines, and rounded cards that lift on hover. Content fades up as
-it scrolls into view, and the whole thing respects `prefers-reduced-motion`. Inspired by
+The brand palette: deep muted green (`#173f35`) into a secondary green (`#2f6657`) carrying
+every accent, on a warm off-white canvas (`#f6f5f0`) with near-black ink (`#151a18`). A warm
+orange (`#d97941`) appears sparingly — today only on the high-priority chip. Inter with tight
+tracking on the headlines, rounded cards that lift on hover. Content fades up as it scrolls
+into view, and the whole thing respects `prefers-reduced-motion`. Inspired by
 [jitter.video](https://jitter.video).
 
 ## Deploying to Netlify
