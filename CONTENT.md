@@ -1,8 +1,9 @@
 # Adding an article
 
 Every article is **one markdown file** in `src/content/articles/`. Add files, open a PR,
-Netlify builds the site. Nothing else needs to change — the homepage, the archive, and
-the article page all pick it up automatically.
+Netlify builds the site. Nothing else needs to change — the homepage, the day page, the
+archive, and the article page all pick it up automatically. Articles are grouped into day
+pages by their `date`, so every file dated `2026-08-17` lands on `/days/2026-08-17/`.
 
 ## File naming
 

@@ -1,0 +1,336 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleBody from '../../components/ArticleBody.astro';
+import { getPublishedArticles, groupByDay, formatDate } from '../../lib/articles';
+
+export async function getStaticPaths() {
+  const days = groupByDay(await getPublishedArticles());
+  return days.map((day) => ({ params: { date: day.key }, props: { day } }));
+}
+
+const { day } = Astro.props;
+const { articles, date } = day;
+const heading = formatDate(date);
+const count = articles.length;
+---
+
+<BaseLayout
+  title={heading}
+  description={`All ${count} AI ${count === 1 ? 'story' : 'stories'} from ${heading}.`}
+>
+  <section class="day">
+    <div class="wrap">
+      <a class="back" href="/">
+        <span class="arrow" aria-hidden="true">←</span> All days
+      </a>
+
+      <header class="day-head">
+        <span class="eyebrow"><span class="dot"></span> Daily briefing</span>
+        <h1>{heading}</h1>
+        <p class="lede">
+          {count} {count === 1 ? 'story' : 'stories'} — pick one to read.
+        </p>
+      </header>
+
+      <div class="layout">
+        <aside class="rail">
+          <h2 class="rail-title">Stories</h2>
+          <div
+            class="pills"
+            role="tablist"
+            aria-orientation="vertical"
+            aria-label={`Stories from ${heading}`}
+          >
+            {
+              articles.map((article, i) => (
+                <button
+                  type="button"
+                  class:list={['pill', { 'is-active': i === 0 }]}
+                  role="tab"
+                  id={`tab-${article.id}`}
+                  aria-controls={`panel-${article.id}`}
+                  aria-selected={i === 0 ? 'true' : 'false'}
+                  tabindex={i === 0 ? 0 : -1}
+                  data-story={article.id}
+                >
+                  <span class="pill-num" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <span class="pill-text">{article.data.title}</span>
+                </button>
+              ))
+            }
+          </div>
+        </aside>
+
+        <div class="stage" id="stage">
+          {
+            articles.map((article, i) => (
+              <section
+                class="panel"
+                id={`panel-${article.id}`}
+                role="tabpanel"
+                aria-labelledby={`tab-${article.id}`}
+                tabindex="0"
+                data-panel={article.id}
+                hidden={i !== 0}
+              >
+                <ArticleBody article={article} headingLevel={2} />
+              </section>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // One story visible at a time. The pills are a tablist; the URL hash keeps the
+  // selection shareable and survives a reload.
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.pill[data-story]'));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('.panel[data-panel]'));
+  const narrow = window.matchMedia('(max-width: 900px)');
+
+  function show(id: string, { focusPill = false, scroll = false } = {}) {
+    const target = tabs.find((tab) => tab.dataset.story === id);
+    if (!target) return;
+
+    for (const tab of tabs) {
+      const active = tab === target;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', String(active));
+      tab.tabIndex = active ? 0 : -1;
+    }
+
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.panel !== id;
+    }
+
+    if (focusPill) target.focus();
+    // Stacked on small screens the panel sits below the pills, so bring it up.
+    if (scroll && narrow.matches) {
+      document.getElementById('stage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  for (const tab of tabs) {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.story!;
+      history.replaceState(null, '', `#${id}`);
+      show(id, { scroll: true });
+    });
+  }
+
+  // Arrow keys move between pills, matching normal tablist behaviour.
+  for (const [index, tab] of tabs.entries()) {
+    tab.addEventListener('keydown', (event) => {
+      const keys = ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+
+      let next = index;
+      if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = index + 1;
+      else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') next = index - 1;
+      else if (event.key === 'Home') next = 0;
+      else next = tabs.length - 1;
+
+      const wrapped = (next + tabs.length) % tabs.length;
+      const id = tabs[wrapped]?.dataset.story;
+      if (!id) return;
+      history.replaceState(null, '', `#${id}`);
+      show(id, { focusPill: true });
+    });
+  }
+
+  // Deep link: /days/2026-08-18/#2026-08-18-some-slug opens that story.
+  function fromHash() {
+    const id = decodeURIComponent(location.hash.replace(/^#/, ''));
+    if (id) show(id);
+  }
+
+  fromHash();
+  window.addEventListener('hashchange', fromHash);
+</script>
+
+<style>
+  .day {
+    padding: clamp(36px, 6vw, 72px) 0 0;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    font-weight: 550;
+    color: var(--ink-3);
+    transition: color 0.2s var(--ease);
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  .back .arrow {
+    display: inline-block;
+    transition: transform 0.2s var(--ease);
+  }
+
+  .back:hover .arrow {
+    transform: translateX(-3px);
+  }
+
+  .day-head {
+    margin: 26px 0 36px;
+  }
+
+  .day-head h1 {
+    margin-top: 14px;
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+  }
+
+  .day-head .lede {
+    margin-top: 14px;
+  }
+
+  /* Narrow rail of story pills on the left, one story in the stage on the right. */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+    padding-bottom: 24px;
+  }
+
+  .rail {
+    position: sticky;
+    top: 88px;
+  }
+
+  .rail-title {
+    font-size: 13px;
+    font-weight: 660;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 12px;
+  }
+
+  .pills {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Long days scroll inside the rail instead of running off the screen. */
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .pill {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 14px;
+    border-radius: 999px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 550;
+    line-height: 1.35;
+    letter-spacing: -0.005em;
+    color: var(--ink-2);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition:
+      color 0.2s var(--ease),
+      background 0.2s var(--ease),
+      border-color 0.2s var(--ease),
+      transform 0.2s var(--ease);
+  }
+
+  .pill:hover {
+    color: var(--ink);
+    border-color: var(--line-strong);
+    transform: translateX(2px);
+  }
+
+  .pill.is-active {
+    background: var(--grad-soft);
+    border-color: var(--accent-line);
+    color: var(--accent);
+  }
+
+  .pill-num {
+    flex-shrink: 0;
+    width: 18px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+    padding-top: 1px;
+  }
+
+  .pill.is-active .pill-num {
+    color: var(--accent);
+  }
+
+  .pill-text {
+    /* Pills stay compact: three lines of the headline, then an ellipsis. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .stage {
+    min-width: 0;
+    max-width: 760px;
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  .panel:focus-visible {
+    outline-offset: 8px;
+  }
+
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .rail {
+      position: static;
+    }
+
+    /* Stacked: the rail becomes a swipeable row of pills above the story. */
+    .pills {
+      flex-direction: row;
+      max-height: none;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .pill {
+      width: auto;
+      flex: 0 0 auto;
+      max-width: 260px;
+      align-items: center;
+    }
+
+    .pill-text {
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .pill:hover {
+      transform: none;
+    }
+  }
+</style>

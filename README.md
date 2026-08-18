@@ -22,9 +22,15 @@ plain HTML by the time it reaches Netlify.
 
 | Page                  | Route                | What it does                                                        |
 | --------------------- | -------------------- | ------------------------------------------------------------------- |
-| Home                  | `/`                  | Hero + the 12 most recent articles as cards.                         |
+| Home                  | `/`                  | Hero + the 12 most recent **days** as cards, each listing that day's headlines. |
+| Day                   | `/days/YYYY-MM-DD/`  | Every story from one day. Pills on the left, one story in the body.  |
 | Article               | `/articles/<slug>/`  | One page per story, generated from the markdown frontmatter.         |
 | Archive               | `/archive/`          | Every article by title, grouped by year, with keyword search.        |
+
+The homepage is a card per *day*, not per story. Clicking one opens that day's page, where
+the story pills in the left rail switch the body between the day's articles — one at a
+time, in the same format the standalone article page uses. The selected story is written
+to the URL hash, so `/days/2026-08-18/#2026-08-18-some-slug` deep-links straight to it.
 
 The archive search filters titles client-side with plain JavaScript — no search index to
 build or keep in sync. It will comfortably handle a few thousand entries.
@@ -44,10 +50,10 @@ so a broken PR can't silently publish a broken page.
 src/
   content/articles/     # one markdown file per article — this is the whole "database"
   content.config.ts     # frontmatter schema (edit here to add a field)
-  pages/                # index.astro, archive.astro, articles/[...slug].astro
-  components/           # Header, Footer, ArticleCard
+  pages/                # index.astro, archive.astro, days/[date].astro, articles/[...slug].astro
+  components/           # Header, Footer, DayCard, ArticleBody
   layouts/BaseLayout.astro
-  lib/articles.ts       # sorting, date formatting, source-domain helper
+  lib/articles.ts       # sorting, day grouping, date formatting, source-domain helper
   styles/global.css     # design tokens + shared styles
   site.config.ts        # title, tagline, CTA text, social links
 public/favicon.svg
@@ -62,14 +68,19 @@ public/eamonn-cottrell.jpg   # hero headshot (see below)
   `site.authorPhoto` at a different file in `public/`. It is cropped to a circle, so a
   square source looks best.
 - **Colors, fonts, spacing, radii** → the `:root` tokens at the top of `src/styles/global.css`
+- **The brand palette** → the five hex values at the top of `src/styles/global.css`. Every
+  gradient, chip, link, border, button glow and focus ring is mixed off them, so the site
+  recolors from that one block. `public/favicon.svg` carries the same gradient by hand.
 - **Adding a frontmatter field** → `src/content.config.ts`, then render it in
-  `src/pages/articles/[...slug].astro`
+  `src/components/ArticleBody.astro` (shared by the day page and the article page)
 
 ## Design
 
-Light canvas, near-black ink, one violet→blue gradient carrying every accent, Inter with
-tight tracking on the headlines, and rounded cards that lift on hover. Content fades up as
-it scrolls into view, and the whole thing respects `prefers-reduced-motion`. Inspired by
+The brand palette: deep muted green (`#173f35`) into a secondary green (`#2f6657`) carrying
+every accent, on a warm off-white canvas (`#f6f5f0`) with near-black ink (`#151a18`). A warm
+orange (`#d97941`) appears sparingly — today only on the high-priority chip. Inter with tight
+tracking on the headlines, rounded cards that lift on hover. Content fades up as it scrolls
+into view, and the whole thing respects `prefers-reduced-motion`. Inspired by
 [jitter.video](https://jitter.video).
 
 ## Deploying to Netlify
