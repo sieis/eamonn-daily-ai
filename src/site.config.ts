@@ -30,7 +30,7 @@ export const cta = {
 /** The hero's primary button — a newsletter signup, not the "Book a call" CTA. */
 export const newsletter = {
   buttonLabel: 'Get Daily AI by email',
-  buttonHref: 'https://www.gotsheet.xyz/subscribe',
+  buttonHref: 'https://www.gotsheet.xyz/daily-ai',
 };
 
 export const socials = [
