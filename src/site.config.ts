@@ -27,10 +27,10 @@ export const cta = {
   buttonHref: 'https://www.gotsheet.xyz/products/consulting-call-with-eamonn',
 };
 
-/** The hero's primary button — a newsletter signup, not the "Book a call" CTA. */
+/** The hero's primary button — links to the same booking page as the "Book a call" CTA. */
 export const newsletter = {
-  buttonLabel: 'Get Daily AI by email',
-  buttonHref: 'https://www.gotsheet.xyz/daily-ai',
+  buttonLabel: 'Work with me',
+  buttonHref: cta.buttonHref,
 };
 
 export const socials = [
